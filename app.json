@@ -1,0 +1,55 @@
+{
+  "expo": {
+    "name": "ICTE Community",
+    "slug": "ICTE",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/images/ict.png",
+    "scheme": "icte",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rekankoye.ICTE",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/ict.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.rekankoye.ICTE"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/ict.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/ict.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "sdkVersion": "53.0.0",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b04eae95-495b-425c-bde7-c799f66fd7ef"
+      }
+    }
+  },
+  "name": "icte"
+}
