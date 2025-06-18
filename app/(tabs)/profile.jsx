@@ -1,14 +1,34 @@
-import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, Image, Alert } from 'react-native'
 import React, { useContext } from 'react'
-import { logout } from '../../assets/appwritedb'
+import { logout, updatePFP, uploadedURL } from '../../assets/appwritedb'
 import { useRouter } from 'expo-router'
 import { AuthContext } from '../AuthContext'
+import * as ImagePicker from 'expo-image-picker'
 
 const profile = () => {
-  const {LoggedIn, setLoggedIn , setCurrentUser, setLoading} = useContext(AuthContext);
+  const {LoggedIn, setLoggedIn , setCurrentUser, setLoading , pfp , CurrentUser} = useContext(AuthContext);
   const router = useRouter();
 
-
+  const pickImage = async() => {
+      const {states} =  await ImagePicker.requestMediaLibraryPermissionsAsync();
+      // if (states !== 'granted'){
+      //   Alert.alert('Permission Required',
+      //     'Sorry, we need camera roll permissions to make this work!',
+      //     [{ text: 'OK' }])
+      //     return;
+      // }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [1,1],
+        quality: 0.8,
+      });
+      if(!result.canceled){
+        setLoading(true)
+        const result2 = await uploadedURL(result.assets[0])
+        await updatePFP(CurrentUser.$id,result2.URL , result2.imageId)
+        setLoading(false)
+      }
+    }
   const handleLogout = async( ) => {
     setLoading(true)
     if(!LoggedIn) {
@@ -18,43 +38,67 @@ const profile = () => {
       return;
     }
     await logout();
-    await setLoggedIn(false);
+    setLoggedIn(false);
     setCurrentUser('')
     setLoading(false);
     router.replace('/(auth)/signIn')  
   }
   return (
-      <TouchableOpacity style={styles.rowContainer}onPress={handleLogout}>
+  <View style={styles.container}>
+    <View style={styles.pfpContainer}>
+      <Image source={{uri : pfp}} style={styles.profilePic}/>
+      <TouchableOpacity onPress={pickImage}>
+        <Text style={styles.text}>
+          Change Profile Picture
+        </Text>
+       </TouchableOpacity>
+    </View>
+    <View style={styles.rowContainer}>
+      <TouchableOpacity style={{flexDirection: 'row'}}onPress={handleLogout}>
         <Image style={styles.icon} source={require('../../assets/images/sign-out.png')}/>
         <Text style={styles.text}>Log Out</Text>
       </TouchableOpacity> 
-
+    </View>
+</View>
   )
 }
 
 export default profile
 
 const styles = StyleSheet.create({
+  container:{
+    flexDirection: 'column',
+    flex: 1,
+    justifyContent: 'center',
+    margin: 10,
+  },
+  pfpContainer:{
+    flex: 1,
+    flexDirection: 'column',
+    width: '90%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 'auto'
+  },
   rowContainer:{
     flex: 1,
     flexDirection: 'row',
     width: '90%',
     justifyContent: 'center',
     margin: 'auto',
-    alignSelf: 'center',
-    marginVertical: '90%'
-
   },
   icon: {
-    
     height: 30,
     width: 30,
     marginHorizontal: 10,
-    paddingTop: 5,
   },
   text:{
-    
     fontSize: 20,
     color: "#292929",
+  },
+  profilePic:{
+    height: 100,
+    width: 100,
+    borderRadius: 20,
   }
 })

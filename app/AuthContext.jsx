@@ -1,6 +1,6 @@
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { ActivityIndicator,StyleSheet , View } from 'react-native';
-
+import { getProfile } from '../assets/appwritedb';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -12,6 +12,23 @@ export const AuthProvider = ({ children }) => {
   const [CurrentUser , setCurrentUser] = useState('')
   const [repliesShown , setRepliesShown] = useState(false)
   const [currentPost , setCurrentPost] = useState('')
+
+  useEffect(()=>{
+   setup();
+  }, [CurrentUser, LoggedIn])
+
+  const setup = async ()=>{
+     if(CurrentUser && LoggedIn){
+      const profile = await getProfile(CurrentUser.$id)
+      setPfp(profile)
+      setName(CurrentUser.name);}
+      else if (!CurrentUser && !LoggedIn){
+        setName('')
+        setPfp('')
+      }
+      
+  }
+
   return (
     <AuthContext.Provider value={{ 
       LoggedIn, setLoggedIn ,

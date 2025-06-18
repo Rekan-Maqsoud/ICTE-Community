@@ -1,17 +1,22 @@
 import { AuthContext } from '../../app/AuthContext';
-import React, { useContext, useState , useCallback } from 'react';
+import React, { useContext, useState , useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Pressable, Modal, Share, Alert } from 'react-native'
-import { deletePost } from '../appwritedb';
+import { deletePost, getProfile } from '../appwritedb';
 
 
-const Post = ({$id, userId, username  , postImage, postParagraph , imageId , $createdAt , $updatedAt }) => {
+const Post = ({$id, userId, username  , postImage, postParagraph , imageId , $createdAt , $updatedAt}) => {
   const {CurrentUser, setLoading , setRepliesShown, setCurrentPost} = useContext(AuthContext);
   const [menuVisible, setMenuVisible] = useState(false);
-
-  const pfp = 'https://fra.cloud.appwrite.io/v1/storage/buckets/6846be5400304cffc4b4/files/684da7c800163fdc3999/view?project=6846aab500310c73bd23&mode=admin';
-  
   const [showFull, setShowFull] = useState(false)
   const [textShown, setTextShown] = useState(false)
+  const [userPFP, setUserPFP] = useState('');
+
+  useEffect(()=>{getpfp()},[])
+  const getpfp = async ()=>{
+    const pfp =  await getProfile(userId)
+    setUserPFP(pfp)
+  }
+  
 
   const onTextLayout = useCallback(e => {
     setTextShown(e.nativeEvent.lines.length > 3)
@@ -81,7 +86,7 @@ const Post = ({$id, userId, username  , postImage, postParagraph , imageId , $cr
       </Modal>
     <View style={style.postCard}>
       <View style={{flexDirection: 'row'}}>
-        <Image source={{uri: pfp}} style={style.pfpStyle}/> 
+        <Image source={{uri: userPFP}} style={style.pfpStyle}/> 
         <Text style={style.username}> {username} </Text>
         <Text style={{fontSize: 10,color: 'rgba(31,31,31,0.7)',padding:8}}>{timeAgo($createdAt)} </Text>
       </View>

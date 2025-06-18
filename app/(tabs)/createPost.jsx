@@ -1,19 +1,19 @@
 import { StyleSheet, Text , View , TouchableOpacity , Image, TextInput, ScrollView} from 'react-native'
-import { useContext, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 
 import * as ImagePicker from 'expo-image-picker'
 import { newPost, uploadedURL } from '../../assets/appwritedb'
-import { useRouter } from 'expo-router'
+import { useFocusEffect, useRouter } from 'expo-router'
 import { AuthContext } from '../AuthContext'
 
 const createPost = () => {
-  const {setLoading , name , CurrentUser} = useContext(AuthContext)
+  const {setLoading , name , CurrentUser , pfp, loading} = useContext(AuthContext)
   const [text , setText] = useState('');
   const [selectedImage , setSelectedImage] = useState('');
   const router = useRouter();
-  
+
+
   const pickImage = async() => {
-    
     const {states} =  await ImagePicker.requestMediaLibraryPermissionsAsync();
     // if (states !== 'granted'){
     //   Alert.alert('Permission Required',
@@ -34,11 +34,9 @@ const createPost = () => {
 
     setLoading(true)
     let result = {URL: null, imageId: null};
-    
     if (selectedImage) 
       result = await uploadedURL(selectedImage);
     await newPost(CurrentUser.$id, name,text,result.URL || null, result.imageId || null)
-    
     setText(null);
     setSelectedImage(null);
     setLoading(false)
@@ -50,7 +48,7 @@ const createPost = () => {
       <ScrollView>
       <View style={style.container}>
       <View style={{flexDirection: 'row', }}>
-              <Image source={{uri: 'https://fra.cloud.appwrite.io/v1/storage/buckets/6846be5400304cffc4b4/files/684da7c800163fdc3999/view?project=6846aab500310c73bd23&mode=admin'}} style={style.pfpStyle}/> 
+              <Image source={{uri: pfp}} style={style.pfpStyle}/> 
               <Text style={style.nameStyle}>{name}</Text>
               <TouchableOpacity style={style.options}>
                   <Text style={{fontSize: 20,fontWeight: 'bold'}}>...</Text>
@@ -68,7 +66,7 @@ const createPost = () => {
       </View>
       <View style={{marginTop: 70,}}>
       {!selectedImage ? 
-      <TouchableOpacity style={style.addImage}onPress={pickImage}><Text style={{fontSize: 16,fontWeight: 'bold'}}>Add Image</Text></TouchableOpacity> :
+      <TouchableOpacity style={style.addImage} onPress={pickImage}><Text style={{fontSize: 16,fontWeight: 'bold'}}>Add Image</Text></TouchableOpacity> :
       <View style={{position: 'relative', backgroundColor: 'rgba(149, 255, 255, 0.05)'}}>
         <Image style={style.postImageStyle} source={{uri: selectedImage.uri}}/>
         <TouchableOpacity style={style.cancelImage} onPress={() => setSelectedImage(null)}>

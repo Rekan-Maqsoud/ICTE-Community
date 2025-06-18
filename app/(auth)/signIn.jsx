@@ -6,7 +6,7 @@ import { AuthContext } from '../AuthContext'
 import { useRouter } from 'expo-router'
 
 const signIn = () => {
-  const { setLoggedIn , setLoading , setCurrentUser , setName} = useContext(AuthContext);
+  const { setLoggedIn , setLoading , setCurrentUser , setName } = useContext(AuthContext);
   const [email , setEmail] = useState('')
   const [password , setPassword] = useState('')
   const router = useRouter() ;
@@ -18,10 +18,11 @@ const signIn = () => {
   const init = async() => {
     setLoading(true);
     const result = await CheckLoginStates();
+    
     if(result.$id){
       setLoggedIn(true)
       setCurrentUser(result);
-      setName(result.name)
+      setLoading(false);
       router.replace('/');
     }
     setLoading(false);
@@ -32,15 +33,17 @@ const signIn = () => {
       setLoading(true)
       try{
       const result = await logIn(email,password);
+      
       if(result){
         setLoggedIn(true);
-        setCurrentUser(result);
-        setName(result.user.name)
+        setCurrentUser(result.user);
+        setLoading(false)
         router.replace('/')
       }
       }catch(error){
-        Alert.alert(`${error}`);}
-      setLoading(false)
+        setLoading(false)
+        Alert.alert(`${error}`);
+      }
   }
  
   return (

@@ -2,7 +2,7 @@ import { use } from "react";
 import { Alert, Platform } from "react-native";
 import { Account, Client, Databases, ID, Query, Storage } from "react-native-appwrite";
 const database_id = process.env.EXPO_PUBLIC_DB_ID;
-const profile = process.env.EXPO_PUBLIC_DB_PROFILE_ID;
+const profileRef = process.env.EXPO_PUBLIC_DB_PROFILE_ID;
 const postRef = process.env.EXPO_PUBLIC_DB_POSTS_ID;
 const repliesRef = process.env.EXPO_PUBLIC_DB_REPLIES_ID;
 const postStorage = process.env.EXPO_PUBLIC_STORAGE_POSTS;
@@ -20,8 +20,9 @@ const storage = new Storage(client);
 const account = new Account(client);
 
 export const createNewAccount = async(email,password, name) =>{
-    await account.create(ID.unique(),email,password,name);
-    await database.createDocument(database_id,profile,ID.unique(),{
+    const id = ID.unique()
+    await account.create(id,email,password,name);
+    await database.createDocument(database_id,profileRef,id,{
         name: name,
         email: email,
         password: password,
@@ -73,7 +74,7 @@ export const uploadedURL = async (asset) => {
     return {URL:fileUrl , imageId: response.$id};
     }
     catch(error){
-        Alert.alert(error)
+        Alert.alert(`${error}`)
     return {URL:null , imageId: null};
 }
 }
@@ -87,10 +88,10 @@ export const uploadedURL = async (asset) => {
         uri: url.href,
     }
     }catch(error){
-        console.error(error)
+        Alert.alert(`${error}`)
     }
 }
-export const newPost = async(userId ,username, text,image , imageId) => {
+export const newPost = async(userId ,username, text,image , imageId,pfp) => {
     try{
     const post =  await database.createDocument(
         database_id,postRef,ID.unique(),{
@@ -99,10 +100,11 @@ export const newPost = async(userId ,username, text,image , imageId) => {
             postParagraph: text,
             postImage: image,
             imageId: imageId,
+            userPFP: pfp,
         }
     )}
     catch(error){
-        Alert.alert(error)
+        Alert.alert(`${error}`)
     }
 }
 
@@ -128,7 +130,18 @@ export const getReplies = async(postId)=>{
         ])
     return result}
     catch(error){
-        console.log(error)
+        Alert.alert(`${error}`)
     }
 }
-//new Functions will go here 
+export const getProfile= async (uid) =>{
+    
+    if(uid){   
+    const documents = await database.getDocument(database_id,profileRef ,uid)
+    return documents.pfp
+}
+    else 
+    return false
+}
+export const updatePFP = async(uid, image , imageId)=>{
+    await database.updateDocument(database_id,profileRef,uid,{pfp: image, pfpId: imageId})
+}

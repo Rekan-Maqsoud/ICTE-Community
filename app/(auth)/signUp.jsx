@@ -1,12 +1,12 @@
 import { createNewAccount, logIn } from '../../assets/appwritedb'
-import React, { useContext, useState } from 'react'
+import  { useContext, useState } from 'react'
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { AuthContext } from '../AuthContext'
 import {useRouter } from 'expo-router'
 
 const signUp = () => {
-  const { setLoggedIn } = useContext(AuthContext);
+  const { setLoggedIn , setLoading , setCurrentUser } = useContext(AuthContext);
   const [name , setName]= useState('')
   const [email , setEmail] = useState('')
   const [password , setPassword] = useState('')
@@ -15,20 +15,26 @@ const signUp = () => {
 
 
   async function handleSignUp  (){
+    setLoading(true)
     try{
     if(password === confirmPassword){
       await createNewAccount(email,password,name)
       const result = await logIn(email,password);
       
-        if(result.$id)
+        if(result.$id){
           setLoggedIn(true);
+          setCurrentUser(result);
+          router.replace('/');
+        }
       Alert.alert('Account Successfully Created !')
       router.replace('/')
     }
     else
     Alert.alert('Confirm Your Password correctly!')
+  setLoading(false)
   }catch(error){
-    console.log(error)
+    Alert.alert(`${error}`)
+    setLoading(false)
   }
   }
 
