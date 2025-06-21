@@ -1,17 +1,20 @@
 import { createContext, useEffect, useState } from 'react';
 import { ActivityIndicator,StyleSheet , View } from 'react-native';
 import { getProfile } from '../assets/appwritedb';
+
+
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [LoggedIn, setLoggedIn] = useState(false);
   const [name , setName] = useState('Guest')
-  const [pfp , setPfp] = useState('')
+  const [pfp , setPfp] = useState('https://fra.cloud.appwrite.io/v1/storage/buckets/6846be5400304cffc4b4/files/684da7c800163fdc3999/view?project=6846aab500310c73bd23&mode=admin')
   const [loading , setLoading] = useState(true)
   const [Active, setActive] = useState(false)
   const [CurrentUser , setCurrentUser] = useState('')
   const [repliesShown , setRepliesShown] = useState(false)
   const [currentPost , setCurrentPost] = useState('')
+
 
   useEffect(()=>{
    setup();
@@ -20,7 +23,7 @@ export const AuthProvider = ({ children }) => {
   const setup = async ()=>{
      if(CurrentUser && LoggedIn){
       const profile = await getProfile(CurrentUser.$id)
-      setPfp(profile)
+      setPfp(profile.pfp)
       setName(CurrentUser.name);}
       else if (!CurrentUser && !LoggedIn){
         setName('')
@@ -38,7 +41,7 @@ export const AuthProvider = ({ children }) => {
       Active , setActive,
       CurrentUser, setCurrentUser,
       repliesShown,setRepliesShown,
-      currentPost, setCurrentPost,
+      currentPost, setCurrentPost
       }}>
         {loading && (
         <View style={styles.loadingOverlay}>

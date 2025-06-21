@@ -4,17 +4,18 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Pressable, Modal, Shar
 import { deletePost, getProfile } from '../appwritedb';
 
 
-const Post = ({$id, userId, username  , postImage, postParagraph , imageId , $createdAt , $updatedAt}) => {
-  const {CurrentUser, setLoading , setRepliesShown, setCurrentPost} = useContext(AuthContext);
+const Post = ({$id, userId, username  , postImage, postParagraph , imageId , $createdAt , $updatedAt , setFullImage}) => {
+  const {CurrentUser, setLoading , setRepliesShown, setCurrentPost  } = useContext(AuthContext);
   const [menuVisible, setMenuVisible] = useState(false);
   const [showFull, setShowFull] = useState(false)
   const [textShown, setTextShown] = useState(false)
+  
   const [userPFP, setUserPFP] = useState('https://fra.cloud.appwrite.io/v1/storage/buckets/6846be5400304cffc4b4/files/684da7c800163fdc3999/view?project=6846aab500310c73bd23&mode=admin');
 
   useEffect(()=>{getpfp()},[])
   const getpfp = async ()=>{
-    const pfp =  await getProfile(userId)
-    setUserPFP(pfp)
+    const documents =  await getProfile(userId)
+    setUserPFP(documents.pfp)
   }
   
 
@@ -56,6 +57,8 @@ const Post = ({$id, userId, username  , postImage, postParagraph , imageId , $cr
       Alert.alert(error)
     }
   };
+
+  
   return (
   <>
     <Pressable style={style.options} onPress={() => setMenuVisible(true)}>
@@ -107,9 +110,17 @@ const Post = ({$id, userId, username  , postImage, postParagraph , imageId , $cr
         </TouchableOpacity>)}
 
         {postImage  &&
-        (<Image style={style.postImageStyle} 
-          source={{ uri: postImage}} />)}
+        (<Pressable onPress={() => {
+          setCurrentPost(postImage)
+          setFullImage(true)
+          }}>
+        <Image style={style.postImageStyle} 
+          source={{ uri: postImage}} />
+          </Pressable>
+          )}
       </View>
+
+
       <View style={style.interact}>
         <TouchableOpacity 
         style={style.interactButton}
@@ -123,11 +134,13 @@ const Post = ({$id, userId, username  , postImage, postParagraph , imageId , $cr
         <TouchableOpacity 
         onPress={handleShare} 
         style={style.interactButton}>
-          <Image style={style.interactIcons} source={require('../images/share.png')}/>
+          <Image 
+          style={style.interactIcons} source={require('../images/share.png')}/>
           <Text>Share</Text>
           </TouchableOpacity>
       </View>      
     </View>
+    
    </>
   )
 }
@@ -164,12 +177,12 @@ const style = StyleSheet.create ({
     },
     
     postImageStyle:{
-        resizeMode: 'center',
+        resizeMode: 'cover',
         marginBottom: 10,
-        height:400,
         width: '100%',
+        aspectRatio: 4/5,
     },username: {
-        fontWeight: 'bold',
+        fontWeight: 'semibold',
         fontSize: 18,
         color: '#414141',
     },
@@ -221,4 +234,14 @@ const style = StyleSheet.create ({
     width: 20,
     marginRight: 10,
   },
+  FullImage:{
+    flex: 1,
+    position: 'absolute',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    height: '100%',
+    width: '100%',
+  }
 })

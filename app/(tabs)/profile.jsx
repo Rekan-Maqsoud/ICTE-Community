@@ -4,6 +4,8 @@ import { logout, updatePFP, uploadedURL } from '../../assets/appwritedb'
 import { useRouter } from 'expo-router'
 import { AuthContext } from '../AuthContext'
 import * as ImagePicker from 'expo-image-picker'
+import * as ImageManipulator from 'expo-image-manipulator';
+import * as FileSystem from 'expo-file-system';
 
 const profile = () => {
   const {LoggedIn, setLoggedIn , setCurrentUser, setLoading , pfp , CurrentUser} = useContext(AuthContext);
@@ -20,14 +22,26 @@ const profile = () => {
       const result = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: true,
         aspect: [1,1],
-        quality: 0.8,
+        quality: 1,
       });
-      if(!result.canceled){
-        setLoading(true)
-        const result2 = await uploadedURL(result.assets[0])
-        await updatePFP(CurrentUser.$id,result2.URL , result2.imageId)
-        setLoading(false)
-      }
+
+    if (!result.canceled) {
+      // Resize and compress the image
+      const manipulated = await ImageManipulator.manipulateAsync(
+        result.assets[0].uri,
+        [{ resize: { width: 512, height: 512 } }],
+        { compress: 0.6, format: ImageManipulator.SaveFormat.JPEG }
+      );
+      // Get file info for size
+      const fileInfo = await FileSystem.getInfoAsync(manipulated.uri);
+      const result2 = await uploadedURL({
+        uri: manipulated.uri,
+        fileSize: fileInfo.size,
+        mimeType: 'image/jpeg'
+      });
+      console.log(result2)
+      await updatePFP(CurrentUser.$id, result2.URL, result2.imageId);
+  }
     }
   const handleLogout = async( ) => {
     setLoading(true)

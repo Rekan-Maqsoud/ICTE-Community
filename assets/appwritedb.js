@@ -134,13 +134,13 @@ export const getReplies = async(postId)=>{
     }
 }
 export const getProfile= async (uid) =>{
-    
+    try{
     if(uid){   
     const documents = await database.getDocument(database_id,profileRef ,uid)
-    return documents.pfp
-}
-    else 
-    return false
+    return documents
+}}catch(error){
+    Alert.alert(`${error}`)
+    return false}
 }
 export const updatePFP = async(uid, image , imageId)=>{
     await database.updateDocument(database_id,profileRef,uid,{pfp: image, pfpId: imageId})

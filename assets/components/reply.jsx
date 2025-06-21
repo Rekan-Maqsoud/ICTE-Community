@@ -1,18 +1,20 @@
-import React, { useCallback, useRef, useMemo, useContext, useEffect, useState } from "react";
-import { StyleSheet, View, Text,Image, TouchableOpacity, Alert } from "react-native";
+import { useRef, useMemo, useContext, useEffect, useState } from "react";
+import { StyleSheet, View, Text,Image, TouchableOpacity, Alert  } from "react-native";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { AuthContext } from "../../app/AuthContext";
-import { getReplies, newReply } from "../appwritedb";
+import {  getReplies, newReply } from "../appwritedb";
 import { TextInput } from "react-native-gesture-handler";
+import RenderReplies from "./renderReplies";
 
 const Reply = () => {
-  const {setRepliesShown , repliesShown, currentPost, setCurrentPost, CurrentUser , loading,setLoading}= useContext(AuthContext);
+  const {setRepliesShown , repliesShown, currentPost, setCurrentPost, CurrentUser , loading,setLoading , pfp , name}= useContext(AuthContext);
   const sheetRef = useRef(null);
-  const snapPoints = useMemo(() => [ "75%", "100%"], []);
+  const snapPoints = useMemo(() => [ "100%"], []);
   const [replies , setReplies] = useState('')
   const [reply, setNewReply] = useState('')
   
   const handleReplies = async () => {
+    
     const result = await getReplies(currentPost)
     const resultPro = Object.values(result.documents)
     setReplies(resultPro)
@@ -32,55 +34,55 @@ const Reply = () => {
   useEffect(() => {
      handleReplies()
     if(repliesShown)
-    sheetRef.current?.snapToIndex(1);
+      sheetRef.current?.snapToIndex(1);
+    else 
+      sheetRef.current?.close();
   }, [repliesShown, loading]);
 
-  const renderItem = useCallback(
-    ({ item }) => (
-      <View style={styles.itemContainer}>
-        <Text style={{color: 'black'}}>{item.Reply}</Text>
-      </View>
-    ),
-    []
-  );
   return (
     <View style={styles.container}>
+    
+        
       <BottomSheet
         ref={sheetRef}
         snapPoints={snapPoints}
         enableDynamicSizing={true}
         enablePanDownToClose
-        onClose={() => {setRepliesShown(false)
+        enableContentPanningGesture={true}
+        keyboardBehavior="interactive"
+        keyboardBlurBehavior="restore"
+        onClose={() => {
+          setRepliesShown(false)
           setCurrentPost('')
         }}
       >
-        <BottomSheetFlatList
-          data={replies}
-          keyExtractor={item => item.$id}
-          renderItem={renderItem}
-          contentContainerStyle={styles.contentContainer}
-        />
-
-        <View style={styles.replyContainer}>
-        <Image source={require('../images/Profile.png')} style={{height: 50, width: 50 , borderRadius: 20, margin: 10,}} />
+          <View style={styles.replyContainer}>
+        <Image source={{uri : pfp}} style={{height: 40, width: 40 , borderRadius: 20, margin: 10,}} />
         <View style={{flexDirection: 'column'}}>
-          <Text style={styles.username}>username</Text>
+          <Text style={styles.username}>{name}</Text>
         <TextInput 
         style={styles.replyInput}
         placeholder="Write an Answer "
         onChangeText={(text) => setNewReply(text)}
         multiline={true}
         value={reply === '' ? null : reply}
+        maxLength={1000}
         />
         </View>
-
         <TouchableOpacity onPress={handleReply} style={styles.handleReply} >
           <Image style={{height: 20,width:20}}
-          source={require('../images/send.png')} />
+          source={require('../images/send.png')}  />
         </TouchableOpacity>
-
         </View>
 
+
+        <BottomSheetFlatList
+          data={replies}
+          keyExtractor={item => item.$id}
+          renderItem={({item}) => (<RenderReplies {...item} />)}
+          contentContainerStyle={styles.contentContainer}
+        />
+        
       </BottomSheet>
 
     </View>
@@ -98,25 +100,20 @@ const styles = StyleSheet.create({
   contentContainer: {
     backgroundColor: "white",
   },
-  itemContainer: {
-    padding: 6,
-    margin: 6,
-    backgroundColor: "#f3f3f3",
-  },
+  
   replyContainer:{
     flexDirection: 'row',
-    height: 70,
-    width: '100%',
-    backgroundColor: '#f9f9f9',
+    width: '97%',
+   
+    backgroundColor: 'rgb(234, 255, 252)',
     shadowColor: '#000',
     shadowOffset: {width: 0,height: 2},
     shadowOpacity: 0.3,
     shadowRadius: 3.84,
     elevation: 3, 
-    marginBottom: 65,
+    margin: 5,
     borderRadius: 15,
     borderWidth: 0.1,
-    
   },
   username:{
     fontSize: 20,
@@ -124,14 +121,19 @@ const styles = StyleSheet.create({
   },
   handleReply:{
     flex: 1,
+    position: 'absolute',
     flexDirection: 'row-reverse',
-    margin: 25,
+    margin: 20,
+    top: 0,
+    right: 0,
   },
   replyInput:{
-    flex: 5,
-    width: '100%',
-    height: 60,
-    marginHorizontal: 40,
+    width: '85%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    maxWidth: '80%',
+    minHeight:40,
+    marginHorizontal: 10,
   }
 });
 
