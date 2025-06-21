@@ -2,7 +2,7 @@
   "expo": {
     "name": "ICTE Community",
     "slug": "ICTE",
-    "version": "1.0.1",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/images/ict.png",
     "scheme": "icte",
