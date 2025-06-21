@@ -9,7 +9,7 @@ const Post = ({$id, userId, username  , postImage, postParagraph , imageId , $cr
   const [menuVisible, setMenuVisible] = useState(false);
   const [showFull, setShowFull] = useState(false)
   const [textShown, setTextShown] = useState(false)
-  const [userPFP, setUserPFP] = useState('');
+  const [userPFP, setUserPFP] = useState('https://fra.cloud.appwrite.io/v1/storage/buckets/6846be5400304cffc4b4/files/684da7c800163fdc3999/view?project=6846aab500310c73bd23&mode=admin');
 
   useEffect(()=>{getpfp()},[])
   const getpfp = async ()=>{
