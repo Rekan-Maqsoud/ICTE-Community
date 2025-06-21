@@ -33,10 +33,11 @@ const Reply = () => {
 
   useEffect(() => {
      handleReplies()
-    if(repliesShown)
-      sheetRef.current?.snapToIndex(1);
-    else 
-      sheetRef.current?.close();
+    if(repliesShown){
+      sheetRef.current?.snapToIndex(1); 
+    }
+    else {
+      sheetRef.current?.close();}
   }, [repliesShown, loading]);
 
   return (
@@ -45,8 +46,8 @@ const Reply = () => {
         
       <BottomSheet
         ref={sheetRef}
+        index={-1}
         snapPoints={snapPoints}
-        enableDynamicSizing={true}
         enablePanDownToClose
         enableContentPanningGesture={true}
         keyboardBehavior="interactive"

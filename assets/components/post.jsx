@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Pressable, Modal, Shar
 import { deletePost, getProfile } from '../appwritedb';
 
 
-const Post = ({$id, userId, username  , postImage, postParagraph , imageId , $createdAt , $updatedAt , setFullImage}) => {
+const Post = ({$id, userId, username  , postImage, postParagraph , imageId , $createdAt , $updatedAt , setFullImage , setFullImageUrl}) => {
   const {CurrentUser, setLoading , setRepliesShown, setCurrentPost  } = useContext(AuthContext);
   const [menuVisible, setMenuVisible] = useState(false);
   const [showFull, setShowFull] = useState(false)
@@ -111,7 +111,7 @@ const Post = ({$id, userId, username  , postImage, postParagraph , imageId , $cr
 
         {postImage  &&
         (<Pressable onPress={() => {
-          setCurrentPost(postImage)
+          setFullImageUrl(postImage)
           setFullImage(true)
           }}>
         <Image style={style.postImageStyle} 
