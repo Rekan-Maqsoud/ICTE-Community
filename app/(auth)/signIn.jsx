@@ -6,7 +6,7 @@ import { AuthContext } from '../AuthContext'
 import { useRouter } from 'expo-router'
 
 const signIn = () => {
-  const { setLoggedIn , setLoading , setCurrentUser , setName } = useContext(AuthContext);
+  const { setLoggedIn , setLoading , setCurrentUser  } = useContext(AuthContext);
   const [email , setEmail] = useState('')
   const [password , setPassword] = useState('')
   const router = useRouter() ;
@@ -16,7 +16,6 @@ const signIn = () => {
   }, [])
   
   const init = async() => {
-    setLoading(true);
     const result = await CheckLoginStates();
     
     if(result.$id){
